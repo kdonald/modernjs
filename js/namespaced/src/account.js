@@ -1,10 +1,24 @@
 var rewardnetwork = rewardnetwork || {};
+rewardnetwork.internal = rewardnetwork.internal || {};
 
-rewardnetwork.createAccount = (function() {
+rewardnetwork.internal.accounts = {
+  withCreditCard: function(creditCard) {
+    // TODO this should retrieve data from some persistent store
+    var account = rewardnetwork.internal.createAccount("Keith Donald").addBeneficiary("Annabelle").addBeneficiary("Corgan").addBeneficiary("Juliet").makeAllocationEven();
+    console.log("Found account: "  + account);
+    return account;
+  },
+  update: function(account) {
+    // TODO this should save data to some persistent store
+    console.log("Updating account: " + account);
+  }
+}
+
+rewardnetwork.internal.createAccount = (function() {
   
   var createBeneficiary = (function() {
     // Beneficiary child entity
-    var beneficiary = Object.create(Object.prototype);
+    var beneficiary = {};
     beneficiary.credit = function(amount) {
       this.savings += amount;
     };
@@ -34,14 +48,16 @@ rewardnetwork.createAccount = (function() {
   });
   account.addBeneficiary = function(name) {
     this.beneficiaries.push(createBeneficiary(name));
+    return this;
   }
   account.makeAllocationEven = function() {
     var even = 100 / this.beneficiaries.length / 100;
     this.beneficiaries.forEach(function(b) {
       b.allocationPercentage = even;
     });
+    return this;
   }
-  account.reward = function(reward) {
+  account.distribute = function(reward) {
     this.beneficiaries.forEach(function(b) {
       b.credit(reward * b.allocationPercentage);
     });  

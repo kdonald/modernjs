@@ -1,17 +1,26 @@
 var rewardnetwork = rewardnetwork || {};
+rewardnetwork.internal = rewardnetwork.internal || {};
 
-// without immediately-executing function expressions we'd re-create obj structures on each invocation - not efficient
-rewardnetwork.createMerchant = (function() {
+rewardnetwork.internal.merchants = {
+  withId: function(id) {
+    // TODO this should retrieve data from some persistent store    
+    var merchant = rewardnetwork.internal.createMerchant("Bizzarros");
+    console.log("Found merchant: " + merchant);
+    return merchant;
+  }
+}
+
+rewardnetwork.internal.createMerchant = (function() {
       
   // reward availability policies
   var availabilityPolicies = {
     always: {
-      test: function(receipt) { 
+      test: function() { 
         return true;
       }      
     },
     never: {
-      test: function(receipt) { 
+      test: function() { 
         return true;
       }      
     },
@@ -25,7 +34,7 @@ rewardnetwork.createMerchant = (function() {
         return indexes;
       }
       var policy = {
-        test: function(receipt) {
+        test: function() {
           return this.availableDays.indexOf(new Date().getDay()) != -1;    
         }
       }
@@ -36,10 +45,10 @@ rewardnetwork.createMerchant = (function() {
   }
 
   // merchant aggregate entity
-  var merchant = Object.create(Object.prototype);
-  merchant.calculateReward = function(receipt) {
-    if (this.availabilityPolicy.test(receipt)) {
-      return receipt.amount * this.rewardPercentage;
+  var merchant = {};
+  merchant.calculateReward = function(purchase, account) {
+    if (this.availabilityPolicy.test(purchase, account)) {
+      return purchase.amount * this.rewardPercentage;
     } else {
       return 0.00;
     }
@@ -52,6 +61,9 @@ rewardnetwork.createMerchant = (function() {
   }
   merchant.availableDays = function(days) {
     this.availabilityPolicy = availabilityPolicies.days(days);
+  }
+  merchant.toString = function() {
+    return this.name + "; rewardPercentage = " + this.rewardPercentage * 100 + "%";
   }
 
   return function(name) {
