@@ -49,3 +49,54 @@ createAccount = function(name) {
     beneficiaries: { value: [] }
   });
 }
+
+// always reward availability policy
+var always = {
+  test: function(receipt) { 
+    return true;
+  }
+}
+
+// never reward availability policy
+var never = {
+  test: function(receipt) { 
+    return false;
+  }
+}
+
+// days of week reward availability policy
+var indexMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
+function indexes(days) {
+  var indexes = new Array(days.length);
+  days.forEach(function(day) {
+    indexes.push(indexMap[day]);
+  });
+  return indexes;
+}
+var daysOfWeek = {
+  test: function(receipt) {
+    return this.availableDays.indexOf(new Date().getDay()) != -1;    
+  }
+};
+var createDaysOfWeek = function(days) {
+  return Object.create(daysOfWeek, { availableDays: { value: indexes(days) } });
+}
+
+// merchant aggregate entity
+
+var merchant = Object.create(Object.prototype);
+merchant.calculateReward = function(receipt) {
+  if (this.availabilityPolicy.test(receipt)) {
+    return receipt.amount * this.rewardPercentage;
+  } else {
+    return 0.00;
+  }
+}
+var createMerchant = function(name) {
+  return Object.create(merchant, {
+    name: { value: name, enumerable: true },
+    rewardPercentage: { value: .08, writable: true, enumerable: true },
+    availabilityPolicy: { value: always, writable: true }
+  });  
+}
+

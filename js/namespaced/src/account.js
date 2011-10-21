@@ -1,21 +1,24 @@
 var rewardnetwork = rewardnetwork || {};
 
-rewardnetwork.createAccount = function(name) {
-  // Beneficiary child entity
-  var beneficiary = Object.create(Object.prototype);
-  beneficiary.credit = function(amount) {
-    this.savings += amount;
-  };
-  beneficiary.toString = function() {
-    return this.name + " (" + this.allocationPercentage * 100 + "%); savings = " + this.savings;
-  }
-  function createBeneficiary(name) {
-    return Object.create(beneficiary, {
-      name: { value: name, enumerable: true },
-      allocationPercentage: { value: 0.00, writable: true, enumerable: true },
-      savings: { value: 0.00, writable: true, enumerable: true }
-    });
-  }
+rewardnetwork.createAccount = (function() {
+  
+  var createBeneficiary = (function() {
+    // Beneficiary child entity
+    var beneficiary = Object.create(Object.prototype);
+    beneficiary.credit = function(amount) {
+      this.savings += amount;
+    };
+    beneficiary.toString = function() {
+      return this.name + " (" + this.allocationPercentage * 100 + "%); savings = " + this.savings;
+    }
+    return function(name) {
+      return Object.create(beneficiary, {
+        name: { value: name, enumerable: true },
+        allocationPercentage: { value: 0.00, writable: true, enumerable: true },
+        savings: { value: 0.00, writable: true, enumerable: true }
+      });
+    }
+  })();
 
   // Account aggregate entity
   var account = Object.create(Object.prototype, {
@@ -47,8 +50,11 @@ rewardnetwork.createAccount = function(name) {
     return this.name + "; totalSavings = " + this.totalSavings + ", beneficiaries = " + this.beneficiaries;
   }
     
-  return Object.create(account, {
-    name: { value: name, enumerable: true },
-    beneficiaries: { value: [] }
-  });
-}
+  return function(name) {
+    return Object.create(account, {
+      name: { value: name, enumerable: true },
+      beneficiaries: { value: [] }
+    });
+  }
+  
+})();
