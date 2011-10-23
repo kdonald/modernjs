@@ -1,16 +1,12 @@
 define([], function() {
 
   // reward availability policies
-  var availabilityPolicies = {
-    always: {
-      test: function() { 
+  var rewardAvailability = {
+    always: function() { 
         return true;
-      }      
     },
-    never: {
-      test: function() { 
+    never: function() { 
         return true;
-      }      
     },
     days: (function() {
       var indexMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
@@ -21,13 +17,11 @@ define([], function() {
         });
         return indexes;
       }
-      var policy = {
-        test: function() {
-          return this.availableDays.indexOf(new Date().getDay()) != -1;    
-        }
-      }
       return function(days) {
-        return Object.create(policy, { availableDays: { value: indexes(days) } });        
+        var availableDays = indexes(days);
+        return function() {
+          return availableDays.indexOf(new Date().getDay()) != -1;
+        }
       }      
     })()
   }
@@ -35,20 +29,23 @@ define([], function() {
   // merchant aggregate entity
   var merchant = {};
   merchant.calculateReward = function(purchase, account) {
-    if (this.availabilityPolicy.test(purchase, account)) {
+    if (this.rewardAvailable(purchase, account)) {
       return purchase.amount * this.rewardPercentage;
     } else {
       return 0.00;
     }
   }
   merchant.alwaysAvailable = function() {
-    this.availabilityPolicy = availabilityPolicies.always;
+    this.rewardAvailable = rewardAvailability.always;
+    return this;
   }
   merchant.neverAvailable = function() {
-    this.availabilityPolicy = availabilityPolicies.never;
+    this.rewardAvailable = rewardAvailability.never;
+    return this;
   }
   merchant.availableDays = function(days) {
-    this.availabilityPolicy = availabilityPolicies.days(days);
+    this.rewardAvailable = rewardAvailability.days(days);
+    return this;
   }
   merchant.toString = function() {
     return this.name + "; rewardPercentage = " + this.rewardPercentage * 100 + "%";
@@ -58,7 +55,7 @@ define([], function() {
     return Object.create(merchant, {
       name: { value: name, enumerable: true },
       rewardPercentage: { value: .08, writable: true, enumerable: true },
-      availabilityPolicy: { value: availabilityPolicies.always, writable: true }
+      rewardAvailable: { value: rewardAvailability.always, writable: true }
     });
   }
   
