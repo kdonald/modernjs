@@ -64,7 +64,7 @@ var accounts = {
     // TODO this should save data to some persistent store
     console.log("Updating account: " + account);
   }
-}
+};
 
 // reward availability policies
 var dayIndexMap = { "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 };
@@ -75,45 +75,39 @@ function dayIndexes(days) {
   });
   return indexes;
 }
-var daysPolicy = {
-  test: function() {
-    return this.availableDays.indexOf(new Date().getDay()) != -1;    
-  }
-}
 
-var availabilityPolicies = {
-  always: {
-    test: function() { 
-      return true;
-    }      
+var rewardAvailability = {
+  always: function() { 
+    return true;
   },
-  never: {
-    test: function() { 
-      return true;
-    }      
+  never: function() { 
+    return true;
   },
   days: function(days) {
-    return Object.create(daysPolicy, { availableDays: { value: dayIndexes(days) } });        
+    var availableDays = dayIndexes(days);
+    return function() {
+      return this.availableDays.indexOf(new Date().getDay()) != -1;    
+    }
   }
-}
+};
 
 // merchant aggregate entity
 var merchant = {};
 merchant.calculateReward = function(purchase, account) {
-  if (this.availabilityPolicy.test(purchase, account)) {
+  if (this.rewardAvailable(purchase, account)) {
     return purchase.amount * this.rewardPercentage;
   } else {
     return 0.00;
   }
 }
 merchant.alwaysAvailable = function() {
-  this.availabilityPolicy = availabilityPolicies.always;
+  this.rewardAvailable = rewardAvailability.always;
 }
 merchant.neverAvailable = function() {
-  this.availabilityPolicy = availabilityPolicies.never;
+  this.rewardAvailabley = rewardAvailability.never;
 }
 merchant.availableDays = function(days) {
-  this.availabilityPolicy = availabilityPolicies.days(days);
+  this.rewardAvailable = rewardAvailability.days(days);
 }
 merchant.toString = function() {
   return this.name + "; rewardPercentage = " + this.rewardPercentage * 100 + "%";
@@ -122,7 +116,7 @@ function createMerchant(name) {
   return Object.create(merchant, {
     name: { value: name, enumerable: true },
     rewardPercentage: { value: .08, writable: true, enumerable: true },
-    availabilityPolicy: { value: availabilityPolicies.always, writable: true }
+    rewardAvailable: { value: rewardAvailability.always, writable: true }
   });  
 }
 
@@ -144,7 +138,7 @@ var rewards = {
     // TODO actually generate a unique confirmation number
     return "123456789";
   }
-}
+};
 
 function rewardForPurchase(purchase) {
   // main logic

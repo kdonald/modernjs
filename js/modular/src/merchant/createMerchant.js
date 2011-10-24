@@ -24,7 +24,7 @@ define([], function() {
         }
       }      
     })()
-  }
+  };
 
   // merchant aggregate entity
   var merchant = {};

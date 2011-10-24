@@ -1,4 +1,4 @@
-define(["account/accounts", "merchant/merchants", "reward/rewards"], function(accounts, merchants, rewards) {
+define("rewardnetwork", ["account/accounts", "merchant/merchants", "reward/rewards"], function(accounts, merchants, rewards) {
   return {
     rewardForPurchase: function(purchase) {
       var account =  accounts.withCreditCard(purchase.creditCard);
