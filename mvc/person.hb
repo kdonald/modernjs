@@ -1,0 +1,1 @@
+<li>{{name}} <span class="select">Select</span></li>
