@@ -5,11 +5,12 @@
   <title>DOM (jQuery)</title>
 </head>
 <body>
-  <button id="ajaxButton">Click Me</button>
-  <button id="ajaxButtonDeferred">Click Me (Deferred)</button>
-  <div id="ajaxResults">
+  <button id="templatingButton">Click Me</button>
+  <div id="templatingResults">
   </div>
-  <p>This is a paragraph. Click me to fire an attached event handler.</p>
   <script data-main="main.js" src="../lib/requirejs-1.0.0/require.js"></script>    
+  <script id="template" type="text/x-handlebars-template">
+    <a href="{{link}}">{{name}}</a>
+  </script>
 </body>
 </html>
