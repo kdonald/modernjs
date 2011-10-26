@@ -15,8 +15,8 @@ ajax - basic ajax example showing traditional and new "deferred" style (jQuery)
        
 templating - client-side templating example with Handlebars
 
-mvc - illustrates mvc principles using my own little mvc.js framework expired by
-      backbone and agilityjs (designed for educational purposes, not for product)
+mvc - illustrates mvc principles using my own little mvc.js framework inspired by
+      Backbone and Agility.js (designed for educational purposes, not for product)
       Get Backbone.js at https://github.com/documentcloud/backbone (see Todos example)
    
 
